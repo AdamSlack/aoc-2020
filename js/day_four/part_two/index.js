@@ -1,9 +1,9 @@
 const fs = require('fs')
 const { findSourceMap } = require('module')
 
-// const fp = './input.txt'
+const fp = './input.txt'
 // const fp = './test_input.txt'
-const fp = './test_input_invalid.txt'
+// const fp = './test_input_invalid.txt'
 // const fp = './test_input_valid.txt'
 // const fp = './test_input_mixed.txt'
 const passportTexts = fs.readFileSync(fp, 'utf-8').split('\n\n')
@@ -18,35 +18,36 @@ const passports = passportTexts.map((passportText) => {
   }, {})
 })
 
-const createNumStringValidator = (min, max, length) => (numString) => numString.length === length && ((num) => num >= min && num <= max)(parseInt(numString))
+const createNumStringValidator = (min, max, length) => {
+  return (numString) => {
+    return numString.length === length 
+      && ((num) => num >= min && num <= max)(parseInt(numString))
+  }
+}
 
 const fieldValidation = {
-  byr: (birthYearString) => createNumStringValidator(4, 1920, 2002)(birthYearString),
-  iyr: (issueYearString) => createNumStringValidator(4, 2010, 2020)(issueYearString),
-  eyr: (expireYearString) => createNumStringValidator(4, 2020, 2030)(expireYearString),
+  byr: (birthYearString) => createNumStringValidator(1920, 2002, 4)(birthYearString),
+  iyr: (issueYearString) => createNumStringValidator(2010, 2020, 4)(issueYearString),
+  eyr: (expireYearString) => createNumStringValidator(2020, 2030, 4)(expireYearString),
   hgt: (heightString) => {
     if(heightString.toLowerCase().includes('cm')) {
-      return createNumStringValidator(3, 150, 193)(heightString)
+      return createNumStringValidator(150, 193, 3)(heightString.replace('cm', ''))
     }
     if(heightString.toLowerCase().includes('in')) {
-      return createNumStringValidator(2, 59, 76)(heightString)
+      return createNumStringValidator(59, 76, 2)(heightString.replace('in', ''))
     }
     return false
   },
   hcl: (hairString) => /^#([0-9a-f]){6}$/.test(hairString),
   ecl: (eyeString) => new Set(['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth']).has(eyeString),
   pid: (pidString) => /^[0-9]{9}$/.test(pidString),
-  // 'cid',
 }
 
 numberOfValidPassports = passports.reduce((acc, passport) => {
-  console.log(passport)
   return Object.entries(fieldValidation).every(([field, isValid]) => {
     const passportFields = Object.keys(passport) 
-    console.log(field)
-    return new Set(passportFields).has(field) && isValid(passportFields[field])
+    return new Set(passportFields).has(field) && isValid(passport[field])
   }) ? acc + 1 : acc
 }, 0)
 
-console.log(passports)
 console.log(numberOfValidPassports)
