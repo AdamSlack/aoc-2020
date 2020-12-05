@@ -10,13 +10,21 @@ const lines = fs.readFileSync(fp, 'utf-8')
 
 const seatValues = lines.map((line) => ({
   fullString: line,
-  fullValue: parseInt(line, 2),
+  val: parseInt(line, 2),
   rowString: line.slice(0,7),
   colString: line.slice(7),
   row: parseInt(line.slice(0,7), 2),
   col: parseInt(line.slice(7), 2),
 }))
 
-seatValues.sort(({fullValue: a}, {fullValue: b}) => b - a)
+seatValues.sort(({val: a}, {val: b}) => b - a)
 
-console.log(seatValues[0])
+console.log('Seat with biggest ID!', seatValues[0])
+
+seatValues.every((seat, idx) => {
+  if(seatValues[idx + 1].val !== seat.val - 1) {
+    console.log('Your Seat!', seat.val - 1)
+    return false;
+  }
+  return true
+});
