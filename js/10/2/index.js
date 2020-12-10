@@ -12,6 +12,7 @@ jolts.sort((a, b) => a - b)
 
 const counts = {
   oneJolt: 0,
+  twoJolt: 0,
   threeJolt: 1, // cause yo' phone is 3 higher than the highest adapter.
   lastJolt: 0,
   optionCount: 0
@@ -28,6 +29,7 @@ for(let i = 0; i < jolts.length; i++) {
     counts.lastJolt = jolt
   }
   if(jolt === counts.lastJolt + 2) {
+    counts.twoJolt += 1
     counts.lastJolt = jolt
   }
 }
