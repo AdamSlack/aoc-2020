@@ -1,7 +1,7 @@
 const fs = require('fs')
 
-const fp = 'test_input.txt'
-// const fp = 'input.txt'
+// const fp = 'test_input.txt'
+const fp = 'input.txt'
 
 let layout = fs.readFileSync(fp, 'utf-8')
   .split('\n')
@@ -14,11 +14,11 @@ let hasChanged = true
 const scan = (dx, dy, x, y) => {
   let i = y + dy;
   let j = x + dx;
-  let hit = '.'
+  let hit = ' '
   
   // if(x===1 && y === 1)console.log('---', dx, dy, x, y, '---')
   while (
-    hit === '.'
+    hit === ' '
     && i < layout.length
     && i >= 0
     && j < layout[i].length
@@ -34,14 +34,13 @@ const scan = (dx, dy, x, y) => {
 const wait = (ms) =>  new Promise(res => {
   setTimeout(res, ms);
 })
-
-const live = async () => {
+const live = async (time) => {
   while(hasChanged) {
 
-    await wait(1000)
+    await wait(time)
     console.log('\033[2J');
     layout.forEach((line) => {
-      console.log(line.join())
+      console.log(line.join(''))
     })
     // console.log(hasChanged)
     hasChanged = false
@@ -62,12 +61,12 @@ const live = async () => {
         }
         // Determine Change
         // if(x===1 && y === 1) console.log(layout[y][x], adjacentOccupancyCount)
-        if(layout[y][x] === 'L' && adjacentOccupancyCount === 0) {
+        if(layout[y][x] === '.' && adjacentOccupancyCount === 0) {
           nextLayout[y][x] = '#'
           hasChanged = true
         }
         else if(layout[y][x] === '#' && adjacentOccupancyCount >= 5) {
-          nextLayout[y][x] = 'L'
+          nextLayout[y][x] = '.'
           hasChanged = true
         } 
       }
@@ -75,11 +74,11 @@ const live = async () => {
     layout = JSON.parse(JSON.stringify(nextLayout))
   } 
 
-  await wait(1000)
+  await wait(time)
   console.log('\033[2J');
   let occupancyCount = 0;
   layout.forEach((line) => {
-    console.log(line.join())
+    console.log(line.join(''))
     line.forEach((seat) => {
       if(seat === '#') {
         occupancyCount++
@@ -87,9 +86,11 @@ const live = async () => {
     })
   })
 
-  await wait(5000)
+  await wait(time)
 
   console.log('Number of occupied Seats!:', occupancyCount)
 }
 
-live()
+const time = 100;
+
+live(time)
