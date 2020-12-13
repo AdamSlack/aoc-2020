@@ -15,37 +15,53 @@ const busTimes = lines[1]
   .split(',')
   .map((time) => time !== 'x' ? parseInt(time, 10) : 'x')
 
-console.log(arrivalTime, busTimes)
 
-const max = Math.max(...busTimes.filter((time) => time !== 'x'))
-const maxIdx = busTimes.indexOf(max)
-
-const indeces = busTimes
+const remainders = busTimes
   .map((time, idx) => time === 'x' ? 'x' : idx)
   .filter((time) => time !== 'x')
 
 const times = busTimes 
   .filter((time) => time !== 'x')
 
-let timestamp = 0
-let meetsRules = false
 
-const big = 100000000000000
-const inc = 10000000000
-let nextLog = inc
 
-while(!meetsRules) {
-  timestamp += max
-  if(timestamp > nextLog) {
-    console.log(timestamp)
-    nextLog += inc
-  }
-  meetsRules = times.every((time, idx) => {
-    if(time === 'x') {
-      return true
+const lcm = times.reduce((acc, a) => acc*a, 1)
+
+const product = (nums) => nums.reduce((acc, a) => acc*a, 1)
+
+const bezoutId = (a, mod) => {
+  let b = a % mod;
+  for (let x = 1; x < mod; x++)
+  {
+    if ((b * x) % mod === 1)
+    {
+        return x;
     }
-    return (timestamp + (indeces[idx] - maxIdx)) % time === 0 
-  })
+  }
+  return 1;
 }
-const answer = timestamp - maxIdx
-console.log('Answer:', answer)
+
+
+const crt = (remainders, modulo) => {
+  const N = product(modulo)
+  const sum = remainders.reduce((acc, r, idx) => {
+    const n = Math.floor((N/modulo[idx]))
+    const b = bezoutId(n, modulo[idx])
+    return acc + (r*b*n)
+  }, 0)
+  return sum % N
+}
+
+// 626670513163231
+// 953803600497198
+// 541780000000309
+console.log(crt([2,3,2], [3,5,7]))
+
+console.log(lcm)
+
+console.log(crt(remainders, times))
+
+const answer = lcm % crt(remainders, times)
+const expected = 626670513163231
+console.log(expected)
+console.log(answer, answer === expected ? 'Correct!' : 'Wrong :(')
